@@ -6,8 +6,37 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		0490DAFE6C6A47EAB4A61777 /* CUratorShareExtension.appex in Embed App Extensions */ = {isa = PBXBuildFile; fileRef = E694C013C1D845678A3694F2 /* CUratorShareExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		AA4D8F8D5A1E4769B174EBCD /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 27D6C9312FDE73220046C489 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 210F910AD270466891D93A40;
+			remoteInfo = CUratorShareExtension;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		076B2C7F778B4B54B77FAAD9 /* Embed App Extensions */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 13;
+			files = (
+				0490DAFE6C6A47EAB4A61777 /* CUratorShareExtension.appex in Embed App Extensions */,
+			);
+			name = "Embed App Extensions";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
 /* Begin PBXFileReference section */
 		27D6C9392FDE73220046C489 /* CUrator.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = CUrator.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		E694C013C1D845678A3694F2 /* CUratorShareExtension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = CUratorShareExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
@@ -17,6 +46,13 @@
 				Info.plist,
 			);
 			target = 27D6C9382FDE73220046C489 /* CUrator */;
+		};
+		47BFF71359264714A7CBCF4E /* Exceptions for "CUratorShareExtension" folder in "CUratorShareExtension" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+			);
+			target = 210F910AD270466891D93A40 /* CUratorShareExtension */;
 		};
 /* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
@@ -29,10 +65,25 @@
 			path = CUrator;
 			sourceTree = "<group>";
 		};
+		EF6A5B2B2ACB40FB927C2939 /* CUratorShareExtension */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				47BFF71359264714A7CBCF4E /* Exceptions for "CUratorShareExtension" folder in "CUratorShareExtension" target */,
+			);
+			path = CUratorShareExtension;
+			sourceTree = "<group>";
+		};
 /* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
 		27D6C9362FDE73220046C489 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		C487019A38374123884C100F /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -46,6 +97,7 @@
 			isa = PBXGroup;
 			children = (
 				27D6C93B2FDE73220046C489 /* CUrator */,
+				EF6A5B2B2ACB40FB927C2939 /* CUratorShareExtension */,
 				27D6C93A2FDE73220046C489 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -54,6 +106,7 @@
 			isa = PBXGroup;
 			children = (
 				27D6C9392FDE73220046C489 /* CUrator.app */,
+				E694C013C1D845678A3694F2 /* CUratorShareExtension.appex */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -61,6 +114,28 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
+		210F910AD270466891D93A40 /* CUratorShareExtension */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 760CCB398D0F4D898EC4E305 /* Build configuration list for PBXNativeTarget "CUratorShareExtension" */;
+			buildPhases = (
+				F1F90ADAC56C4AC0B3849359 /* Sources */,
+				C487019A38374123884C100F /* Frameworks */,
+				D79EC75DDFBC4983BD54F624 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			fileSystemSynchronizedGroups = (
+				EF6A5B2B2ACB40FB927C2939 /* CUratorShareExtension */,
+			);
+			name = CUratorShareExtension;
+			packageProductDependencies = (
+			);
+			productName = CUratorShareExtension;
+			productReference = E694C013C1D845678A3694F2 /* CUratorShareExtension.appex */;
+			productType = "com.apple.product-type.app-extension";
+		};
 		27D6C9382FDE73220046C489 /* CUrator */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = 27D6C94C2FDE73230046C489 /* Build configuration list for PBXNativeTarget "CUrator" */;
@@ -68,10 +143,12 @@
 				27D6C9352FDE73220046C489 /* Sources */,
 				27D6C9362FDE73220046C489 /* Frameworks */,
 				27D6C9372FDE73220046C489 /* Resources */,
+				076B2C7F778B4B54B77FAAD9 /* Embed App Extensions */,
 			);
 			buildRules = (
 			);
 			dependencies = (
+				8EC4A48A29654773B10CEB3F /* PBXTargetDependency */,
 			);
 			fileSystemSynchronizedGroups = (
 				27D6C93B2FDE73220046C489 /* CUrator */,
@@ -93,6 +170,9 @@
 				LastSwiftUpdateCheck = 2610;
 				LastUpgradeCheck = 2610;
 				TargetAttributes = {
+					210F910AD270466891D93A40 = {
+						CreatedOnToolsVersion = 26.1.1;
+					};
 					27D6C9382FDE73220046C489 = {
 						CreatedOnToolsVersion = 26.1.1;
 					};
@@ -113,12 +193,20 @@
 			projectRoot = "";
 			targets = (
 				27D6C9382FDE73220046C489 /* CUrator */,
+				210F910AD270466891D93A40 /* CUratorShareExtension */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
 		27D6C9372FDE73220046C489 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		D79EC75DDFBC4983BD54F624 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -135,7 +223,22 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		F1F90ADAC56C4AC0B3849359 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		8EC4A48A29654773B10CEB3F /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 210F910AD270466891D93A40 /* CUratorShareExtension */;
+			targetProxy = AA4D8F8D5A1E4769B174EBCD /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
 		27D6C94D2FDE73230046C489 /* Debug */ = {
@@ -143,21 +246,23 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = CUrator/CUrator.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 7F35JC748Y;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = CUrator/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = CUrator;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
-				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
-				INFOPLIST_KEY_UIMainStoryboardFile = Main;
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
+				IPHONEOS_DEPLOYMENT_TARGET = 17.6;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = yoseong12.hansung.ac.kr.CUrator;
+				PRODUCT_BUNDLE_IDENTIFIER = com.yoseong12.CUrator;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;
 				SWIFT_APPROACHABLE_CONCURRENCY = YES;
@@ -174,21 +279,23 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = CUrator/CUrator.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 7F35JC748Y;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = CUrator/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = CUrator;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
-				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
-				INFOPLIST_KEY_UIMainStoryboardFile = Main;
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
+				IPHONEOS_DEPLOYMENT_TARGET = 17.6;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = yoseong12.hansung.ac.kr.CUrator;
+				PRODUCT_BUNDLE_IDENTIFIER = com.yoseong12.CUrator;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;
 				SWIFT_APPROACHABLE_CONCURRENCY = YES;
@@ -319,6 +426,64 @@
 			};
 			name = Release;
 		};
+		78F1C065C3A34CE8B310C53E /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				APPLICATION_EXTENSION_API_ONLY = YES;
+				CODE_SIGN_ENTITLEMENTS = CUratorShareExtension/CUratorShareExtension.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 7F35JC748Y;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = CUratorShareExtension/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.6;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.yoseong12.CUrator.ShareExtension;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		CB5C46889A4742E594763205 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				APPLICATION_EXTENSION_API_ONLY = YES;
+				CODE_SIGN_ENTITLEMENTS = CUratorShareExtension/CUratorShareExtension.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 7F35JC748Y;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = CUratorShareExtension/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.6;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.yoseong12.CUrator.ShareExtension;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -336,6 +501,15 @@
 			buildConfigurations = (
 				27D6C94D2FDE73230046C489 /* Debug */,
 				27D6C94E2FDE73230046C489 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		760CCB398D0F4D898EC4E305 /* Build configuration list for PBXNativeTarget "CUratorShareExtension" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				78F1C065C3A34CE8B310C53E /* Debug */,
+				CB5C46889A4742E594763205 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
