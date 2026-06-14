@@ -125,15 +125,15 @@ struct OnboardingView: View {
             }
 
             VStack(spacing: 10) {
-                Text("\(selectedCategories.count)개 카테고리 선택됨")
+                Text("\(categoriesForStart.count)개 카테고리 선택됨")
                     .font(.system(size: 12, weight: .semibold))
                     .foregroundStyle(AppTheme.secondaryText)
 
                 PrimaryActionButton(
                     title: "다시봄 시작하기",
-                    isDisabled: selectedCategories.isEmpty
+                    isDisabled: categoriesForStart.isEmpty
                 ) {
-                    onStart(orderedSelectedCategories)
+                    onStart(categoriesForStart)
                 }
             }
             .padding(.horizontal, 20)
@@ -207,6 +207,15 @@ struct OnboardingView: View {
 
     private var orderedSelectedCategories: [String] {
         allCategories.filter { selectedCategories.contains($0) }
+    }
+
+    private var categoriesForStart: [String] {
+        var categories = orderedSelectedCategories
+        if !trimmedCategoryName.isEmpty,
+           !categories.contains(where: { $0.caseInsensitiveCompare(trimmedCategoryName) == .orderedSame }) {
+            categories.append(trimmedCategoryName)
+        }
+        return categories
     }
 
     private var trimmedCategoryName: String {

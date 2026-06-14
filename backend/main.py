@@ -47,7 +47,7 @@ async def analyze(payload: AnalyzeRequest):
     categories = normalize_categories(payload.categories)
 
     if platform == "Instagram":
-        category = payload.manualCategory if payload.manualCategory in categories else categories[0]
+        category = payload.manualCategory if payload.manualCategory in categories else "분류 필요"
         return AnalyzeResponse(
             url=url,
             platform=platform,
@@ -62,6 +62,8 @@ async def analyze(payload: AnalyzeRequest):
 
     metadata = await fetch_metadata(url, platform)
     classification = await classify_with_ai(metadata, platform, categories)
+    if payload.manualCategory in categories:
+        classification["category"] = payload.manualCategory
 
     return AnalyzeResponse(
         url=url,
@@ -222,7 +224,7 @@ async def classify_with_ai(metadata: dict, platform: str, categories: list[str])
             "title": title,
             "description": description,
             "existing_categories": categories,
-            "instruction": "Return JSON with category, tags, summary. First infer the content topic freely. category should be a concise Korean category name based on the topic. If an existing category is an excellent fit, reuse its exact name. Otherwise suggest a new concise category. tags must be short Korean strings.",
+            "instruction": "Return JSON with category, tags, summary. First infer the content topic freely from title and description. category must be a concise Korean topic category. Reuse an existing category only when it is semantically an excellent fit; never choose an unrelated existing category just because it exists. If no existing category fits, suggest a new concise category. For AI, programming, RAG, tech, lectures, or study content, prefer an existing study/knowledge category such as 공부/정보 when available, otherwise suggest AI/기술 or 공부. tags must be short Korean strings.",
         }
         response = await client.chat.completions.create(
             model=model,
@@ -231,9 +233,10 @@ async def classify_with_ai(metadata: dict, platform: str, categories: list[str])
                 {"role": "user", "content": json.dumps(prompt, ensure_ascii=False)},
             ],
             response_format={"type": "json_object"},
+            temperature=0.1,
         )
         parsed = json.loads(response.choices[0].message.content or "{}")
-        category = parsed.get("category") if isinstance(parsed.get("category"), str) and parsed.get("category").strip() else categories[0]
+        category = parsed.get("category") if isinstance(parsed.get("category"), str) and parsed.get("category").strip() else "분류 필요"
         category = category.strip()[:24]
         tags = parsed.get("tags") if isinstance(parsed.get("tags"), list) else [platform, category]
         summary = parsed.get("summary") or "나중에 다시 보기 위해 저장한 콘텐츠입니다."
@@ -246,13 +249,44 @@ def classify_locally(title: str, description: str, platform: str, categories: li
     text = f"{title} {description}".lower()
 
     direct_match = match_category_name(text, categories)
-    category = direct_match or categories[0]
+    category = direct_match or infer_topic_category(text, categories)
 
     return {
         "category": category,
         "tags": [platform, category],
-        "summary": description[:80] if description else "카테고리 이름과 콘텐츠 정보를 기준으로 임시 분류했어요.",
+        "summary": description[:80] if description else "콘텐츠 제목을 바탕으로 카테고리를 분류했어요.",
     }
+
+
+def infer_topic_category(text: str, categories: list[str]) -> str:
+    topic_rules = [
+        (["ai", "rag", "랭체인", "langchain", "llm", "mcp", "프롬프트", "머신러닝", "인공지능"], ["AI", "Ai", "공부/정보", "공부", "개발", "레퍼런스"]),
+        (["코딩", "개발", "프로그래밍", "python", "swift", "xcode", "fastapi", "api"], ["개발", "공부/정보", "공부", "AI", "Ai", "레퍼런스"]),
+        (["야구", "baseball", "wbc", "kbo", "하이라이트", "월드베이스볼"], ["야구", "스포츠", "다시 볼 것", "레퍼런스"]),
+        (["축구", "fifa", "월드컵", "손흥민"], ["축구", "스포츠", "다시 볼 것", "레퍼런스"]),
+        (["코디", "패션", "옷", "룩북", "스타일", "여름"], ["패션", "스타일 참고", "레퍼런스"]),
+        (["맛집", "카페", "먹방", "레스토랑", "디저트"], ["맛집", "카페", "가볼 곳"]),
+        (["여행", "데이트", "장소", "핫플", "가볼만"], ["가볼 곳", "여행", "레퍼런스"]),
+        (["따라", "튜토리얼", "만들기", "따라하기", "레시피", "운동", "루틴"], ["따라 해볼 것", "운동", "공부/정보"]),
+        (["리뷰", "추천템", "제품", "구매", "쇼핑"], ["사고 싶은 것", "레퍼런스"]),
+    ]
+
+    for keywords, preferred_categories in topic_rules:
+        if any(keyword in text for keyword in keywords):
+            matched = first_existing_category(preferred_categories, categories)
+            if matched:
+                return matched
+            return preferred_categories[0]
+
+    return "레퍼런스" if "레퍼런스" in categories else "분류 필요"
+
+
+def first_existing_category(preferred_categories: list[str], categories: list[str]) -> Optional[str]:
+    for preferred in preferred_categories:
+        for category in categories:
+            if category.casefold() == preferred.casefold():
+                return category
+    return None
 
 
 def match_category_name(text: str, categories: list[str]) -> Optional[str]:

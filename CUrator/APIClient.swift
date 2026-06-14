@@ -67,7 +67,7 @@ struct APIClient {
             title: title,
             category: category,
             tags: makeTags(platform: platform, category: category),
-            summary: platform == .instagram ? "외부 정보 접근 제한으로 카테고리 중심으로 저장했어요." : "백엔드 연결 전 선택한 카테고리 기준으로 임시 저장했어요.",
+            summary: platform == .instagram ? "외부 정보 접근 제한으로 카테고리 확인이 필요해요." : "백엔드 연결 전이라 AI 분류를 완료하지 못했어요.",
             thumbnailURL: nil,
             sourceNote: "Local fallback",
             requiresManualCategory: platform == .instagram
@@ -123,11 +123,7 @@ struct APIClient {
             return directMatch
         }
 
-        if let manualCategory, categories.contains(manualCategory) {
-            return manualCategory
-        }
-
-        return categories.first ?? "기타"
+        return "분류 필요"
     }
 
     private func categoryMatches(_ category: String, in text: String) -> Bool {

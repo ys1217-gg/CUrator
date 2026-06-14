@@ -23,8 +23,8 @@ struct AddContentView: View {
 
     @State private var urlText = ""
     @State private var memo = ""
-    @State private var manualCategory = CategoryItem.defaults.first ?? "기타"
     @State private var selectedCategory = ""
+    @State private var newCategoryName = ""
     @State private var phase: SaveFlowPhase = .input
 
     private let apiClient = APIClient()
@@ -61,7 +61,6 @@ struct AddContentView: View {
                 }
             }
             .onAppear {
-                manualCategory = categories.first?.name ?? manualCategory
                 selectedCategory = categories.first?.name ?? selectedCategory
             }
         }
@@ -94,20 +93,13 @@ struct AddContentView: View {
                 .background(AppTheme.elevatedSurface)
                 .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
 
-                Text("유튜브와 웹 링크는 AI가 주제를 추천하고, 저장 전에 카테고리를 확인할 수 있어요.")
+                Text("AI가 콘텐츠 주제를 먼저 판단하고, 저장 전에 추천 카테고리를 확인할 수 있어요.")
                     .font(.system(size: 12, weight: .medium))
                     .foregroundStyle(AppTheme.accent)
                     .padding(12)
                     .frame(maxWidth: .infinity, alignment: .leading)
                     .background(AppTheme.accentSoft)
                     .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
-
-                Text("기본 저장 위치")
-                    .font(.system(size: 14, weight: .bold))
-                    .foregroundStyle(AppTheme.primaryText)
-                    .padding(.top, 8)
-
-                CategoryPillGrid(categories: categoryNames, selection: $manualCategory)
 
                 TextField("메모를 입력하세요", text: $memo, axis: .vertical)
                     .font(.system(size: 14, weight: .medium))
@@ -210,11 +202,11 @@ struct AddContentView: View {
                                 .clipShape(Circle())
 
                             VStack(alignment: .leading, spacing: 4) {
-                                Text(response.category)
+                                Text(isUnresolvedCategory(response.category) ? "직접 분류 필요" : response.category)
                                     .font(.system(size: 16, weight: .bold))
                                     .foregroundStyle(AppTheme.primaryText)
 
-                                Text(categoryNames.contains(response.category) ? "기존 카테고리에 저장돼요" : "저장하면 새 카테고리로 추가돼요")
+                                Text(recommendationDescription(for: response.category))
                                     .font(.system(size: 12, weight: .medium))
                                     .foregroundStyle(AppTheme.secondaryText)
                             }
@@ -232,16 +224,45 @@ struct AddContentView: View {
                             .foregroundStyle(AppTheme.primaryText)
 
                         CategoryPillGrid(categories: reviewCategoryOptions(for: response), selection: $selectedCategory)
+                            .onChange(of: selectedCategory) { _, value in
+                                guard !value.isEmpty else { return }
+                                newCategoryName = ""
+                            }
                     }
 
-                    if !response.tags.isEmpty {
+                    VStack(alignment: .leading, spacing: 12) {
+                        Text("새 카테고리 만들기")
+                            .font(.system(size: 14, weight: .bold))
+                            .foregroundStyle(AppTheme.primaryText)
+
+                        HStack(spacing: 10) {
+                            TextField("예: AI 공부", text: $newCategoryName)
+                                .textInputAutocapitalization(.never)
+                                .autocorrectionDisabled()
+                                .font(.system(size: 14, weight: .semibold))
+                                .onChange(of: newCategoryName) { _, value in
+                                    guard !value.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else { return }
+                                    selectedCategory = ""
+                                }
+
+                            Image(systemName: "plus.circle.fill")
+                                .font(.system(size: 18, weight: .semibold))
+                                .foregroundStyle(AppTheme.accent)
+                        }
+                        .padding(.horizontal, 14)
+                        .frame(height: 52)
+                        .background(AppTheme.elevatedSurface)
+                        .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
+                    }
+
+                    if !displayTags(for: response).isEmpty {
                         VStack(alignment: .leading, spacing: 10) {
                             Text("태그")
                                 .font(.system(size: 14, weight: .bold))
                                 .foregroundStyle(AppTheme.primaryText)
 
                             LazyVGrid(columns: [GridItem(.adaptive(minimum: 72), spacing: 8)], alignment: .leading, spacing: 8) {
-                                ForEach(response.tags.prefix(5), id: \.self) { tag in
+                                ForEach(displayTags(for: response).prefix(5), id: \.self) { tag in
                                     CapsuleChip(title: tag, isSelected: false)
                                 }
                             }
@@ -253,8 +274,11 @@ struct AddContentView: View {
             }
 
             VStack(spacing: 12) {
-                PrimaryActionButton(title: "\(selectedCategory.isEmpty ? response.category : selectedCategory)로 저장") {
-                    saveConfirmed(response, category: selectedCategory.isEmpty ? response.category : selectedCategory)
+                PrimaryActionButton(
+                    title: primarySaveTitle(for: response),
+                    isDisabled: finalCategory(for: response).isEmpty
+                ) {
+                    saveConfirmed(response, category: finalCategory(for: response))
                 }
 
                 Button {
@@ -277,7 +301,8 @@ struct AddContentView: View {
         .padding(.horizontal, 20)
         .padding(.bottom, 24)
         .onAppear {
-            selectedCategory = response.category
+            newCategoryName = ""
+            selectedCategory = isUnresolvedCategory(response.category) ? "" : response.category
         }
     }
 
@@ -396,19 +421,17 @@ struct AddContentView: View {
         phase = .classifying
 
         do {
-            let response = try await apiClient.analyze(url: trimmedURL, manualCategory: manualCategory, categories: categoryNames)
+            let response = try await apiClient.analyze(url: trimmedURL, manualCategory: nil, categories: categoryNames)
             selectedCategory = response.category
             phase = .review(response)
         } catch {
-            let response = apiClient.fallbackAnalyze(url: trimmedURL, manualCategory: manualCategory, categories: categoryNames)
-            selectedCategory = response.category
-            phase = .review(response)
+            phase = .failure
         }
     }
 
     private func saveConfirmed(_ response: AnalyzeResponse, category: String) {
         let trimmedCategory = category.trimmingCharacters(in: .whitespacesAndNewlines)
-        let finalCategory = trimmedCategory.isEmpty ? manualCategory : trimmedCategory
+        let finalCategory = trimmedCategory.isEmpty ? response.category : trimmedCategory
 
         if !categories.contains(where: { $0.name == finalCategory }) {
             modelContext.insert(CategoryItem(name: finalCategory))
@@ -430,15 +453,51 @@ struct AddContentView: View {
         try? modelContext.save()
         urlText = ""
         memo = ""
+        newCategoryName = ""
         phase = .success(item)
     }
 
     private func reviewCategoryOptions(for response: AnalyzeResponse) -> [String] {
-        var options = [response.category]
+        var options = isUnresolvedCategory(response.category) ? [] : [response.category]
         for name in categoryNames where !options.contains(name) {
             options.append(name)
         }
         return options
+    }
+
+    private func finalCategory(for response: AnalyzeResponse) -> String {
+        let customCategory = newCategoryName.trimmingCharacters(in: .whitespacesAndNewlines)
+        if !customCategory.isEmpty {
+            return customCategory
+        }
+
+        let selected = selectedCategory.trimmingCharacters(in: .whitespacesAndNewlines)
+        if !selected.isEmpty {
+            return selected
+        }
+
+        return isUnresolvedCategory(response.category) ? "" : response.category
+    }
+
+    private func primarySaveTitle(for response: AnalyzeResponse) -> String {
+        let category = finalCategory(for: response)
+        return category.isEmpty ? "카테고리 선택 후 저장" : "\(category)로 저장"
+    }
+
+    private func recommendationDescription(for category: String) -> String {
+        if isUnresolvedCategory(category) {
+            return "새 카테고리를 만들거나 기존 카테고리를 선택해주세요"
+        }
+
+        return categoryNames.contains(category) ? "기존 카테고리에 저장돼요" : "저장하면 새 카테고리로 추가돼요"
+    }
+
+    private func displayTags(for response: AnalyzeResponse) -> [String] {
+        response.tags.filter { !isUnresolvedCategory($0) }
+    }
+
+    private func isUnresolvedCategory(_ category: String) -> Bool {
+        category.trimmingCharacters(in: .whitespacesAndNewlines) == "분류 필요"
     }
 
     private func platformIcon(for platform: ContentPlatform) -> String {

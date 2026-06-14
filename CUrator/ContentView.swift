@@ -37,7 +37,8 @@ struct ContentView: View {
                 }
             } else {
                 OnboardingView { selectedCategories in
-                    createInitialCategories(selectedCategories)
+                    let initialCategories = createInitialCategories(selectedCategories)
+                    SharedImportStore.syncCategories(initialCategories)
                     hasCompletedOnboarding = true
                 }
             }
@@ -47,6 +48,7 @@ struct ContentView: View {
         .task {
             if hasCompletedOnboarding {
                 seedCategoriesIfNeeded()
+                syncSharedCategories()
             }
             await importPendingSharedURLs()
         }
@@ -55,9 +57,18 @@ struct ContentView: View {
             Task {
                 if hasCompletedOnboarding {
                     seedCategoriesIfNeeded()
+                    syncSharedCategories()
                 }
                 await importPendingSharedURLs()
             }
+        }
+        .onChange(of: categories.map(\.name)) { _, _ in
+            syncSharedCategories()
+        }
+        .onChange(of: hasCompletedOnboarding) { _, completed in
+            guard completed else { return }
+            seedCategoriesIfNeeded()
+            syncSharedCategories()
         }
     }
 
@@ -67,27 +78,38 @@ struct ContentView: View {
         try? modelContext.save()
     }
 
-    private func createInitialCategories(_ names: [String]) {
+    @discardableResult
+    private func createInitialCategories(_ names: [String]) -> [String] {
         let trimmedNames = names
             .map { $0.trimmingCharacters(in: .whitespacesAndNewlines) }
             .filter { !$0.isEmpty }
 
-        let uniqueNames = Array(NSOrderedSet(array: trimmedNames)) as? [String] ?? trimmedNames
+        var uniqueNames: [String] = []
+        for name in trimmedNames where !uniqueNames.contains(where: { $0.caseInsensitiveCompare(name) == .orderedSame }) {
+            uniqueNames.append(name)
+        }
+
         let initialNames = uniqueNames.isEmpty ? CategoryItem.defaults : uniqueNames
 
-        for name in initialNames where !categories.contains(where: { $0.name == name }) {
+        for name in initialNames where !categories.contains(where: { $0.name.caseInsensitiveCompare(name) == .orderedSame }) {
             modelContext.insert(CategoryItem(name: name))
         }
 
         try? modelContext.save()
+        return initialNames
+    }
+
+    private func syncSharedCategories() {
+        let names = categories.map(\.name).isEmpty ? CategoryItem.defaults : categories.map(\.name)
+        SharedImportStore.syncCategories(names)
     }
 
     @MainActor
     private func importPendingSharedURLs() async {
         guard !isImportingSharedURLs else { return }
 
-        let urls = SharedImportStore.takePendingURLs()
-        guard !urls.isEmpty else { return }
+        let imports = SharedImportStore.takePendingImports()
+        guard !imports.isEmpty else { return }
 
         isImportingSharedURLs = true
         defer { isImportingSharedURLs = false }
@@ -96,28 +118,26 @@ struct ContentView: View {
         var knownURLs = Set(contentItems.map(\.url))
         var knownCategoryNames = Set(categories.map(\.name))
 
-        for url in urls where !knownURLs.contains(url) {
-            let response: AnalyzeResponse
+        for sharedImport in imports where !knownURLs.contains(sharedImport.url) {
+            let manualCategory = validManualCategory(sharedImport.manualCategory, in: categoryNames)
+            let response = (try? await APIClient().analyze(url: sharedImport.url, manualCategory: manualCategory, categories: categoryNames))
+                ?? APIClient().fallbackAnalyze(url: sharedImport.url, manualCategory: manualCategory, categories: categoryNames)
+            let finalCategory = manualCategory ?? response.category
+            let finalTags = normalizedTags(response.tags, platform: response.platform, category: finalCategory)
 
-            do {
-                response = try await APIClient().analyze(url: url, manualCategory: categoryNames.first, categories: categoryNames)
-            } catch {
-                response = APIClient().fallbackAnalyze(url: url, manualCategory: categoryNames.first, categories: categoryNames)
-            }
-
-            if !knownCategoryNames.contains(response.category) {
-                modelContext.insert(CategoryItem(name: response.category))
-                knownCategoryNames.insert(response.category)
+            if !knownCategoryNames.contains(finalCategory) {
+                modelContext.insert(CategoryItem(name: finalCategory))
+                knownCategoryNames.insert(finalCategory)
             }
 
             let item = ContentItem(
                 title: response.title,
                 url: response.url,
                 platform: response.platform,
-                category: response.category,
+                category: finalCategory,
                 memo: "",
                 summary: response.summary,
-                tags: response.tags,
+                tags: finalTags,
                 thumbnailURL: response.thumbnailURL,
                 sourceNote: response.sourceNote
             )
@@ -127,5 +147,25 @@ struct ContentView: View {
         }
 
         try? modelContext.save()
+    }
+
+    private func validManualCategory(_ category: String?, in categoryNames: [String]) -> String? {
+        guard let category else { return nil }
+        let trimmedCategory = category.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !trimmedCategory.isEmpty else { return nil }
+
+        if let existingCategory = categoryNames.first(where: { $0.caseInsensitiveCompare(trimmedCategory) == .orderedSame }) {
+            return existingCategory
+        }
+
+        return trimmedCategory
+    }
+
+    private func normalizedTags(_ tags: [String], platform: ContentPlatform, category: String) -> [String] {
+        var normalized = [platform.rawValue, category]
+        for tag in tags where tag != "분류 필요" && !normalized.contains(tag) {
+            normalized.append(tag)
+        }
+        return Array(normalized.prefix(5))
     }
 }
