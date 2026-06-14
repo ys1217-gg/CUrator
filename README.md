@@ -94,24 +94,25 @@ Local DB
 
 #### 2.3 결과물
 
-* 홈 화면
+##### 홈 화면 / 보관함 화면
 
-<img width="1206" height="2622" alt="Simulator Screenshot - iPhone 17 - 2026-06-14 at 20 47 26" src="https://github.com/user-attachments/assets/9ec7bbab-a09f-491d-a465-6dd6ac5ac9f3" />
+<p align="center">
 
+  <img width="260" alt="홈 화면" src="https://github.com/user-attachments/assets/9ec7bbab-a09f-491d-a465-6dd6ac5ac9f3" />
 
-* 보관함 화면
+  <img width="260" alt="보관함 화면" src="https://github.com/user-attachments/assets/a87cffb4-c41d-4979-9bb0-79cbb33d4599" />
 
-<img width="1206" height="2622" alt="Simulator Screenshot - iPhone 17 - 2026-06-14 at 20 47 39" src="https://github.com/user-attachments/assets/a87cffb4-c41d-4979-9bb0-79cbb33d4599" />
+</p>
 
+##### 콘텐츠 추가 화면 / 설정 화면
 
-* 콘텐츠 추가 화면
+<p align="center">
 
-<img width="1206" height="2622" alt="Simulator Screenshot - iPhone 17 - 2026-06-14 at 20 48 35" src="https://github.com/user-attachments/assets/3d506717-09a0-412f-93ec-067de0556fc7" />
+  <img width="260" alt="콘텐츠 추가 화면" src="https://github.com/user-attachments/assets/3d506717-09a0-412f-93ec-067de0556fc7" />
 
+  <img width="260" alt="설정 화면" src="https://github.com/user-attachments/assets/f5a28636-bcbf-4ea4-b310-6a0e55887483" />
 
-* 설정 화면
-
-<img width="1206" height="2622" alt="Simulator Screenshot - iPhone 17 - 2026-06-14 at 20 47 46" src="https://github.com/user-attachments/assets/f5a28636-bcbf-4ea4-b310-6a0e55887483" />
+</p>
 
 
 #### 2.4 기대효과
